@@ -2,6 +2,33 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
+import { isDev } from './constant';
+import Logger from 'electron-log';
+import { setUserDataDir } from './utils/file';
+import { registerIpc } from './ipc';
+// import { ConfigManager } from './services/ConfigManager';
+
+if (!isDev) {
+  process.on('uncaughtException', (error) => {
+    Logger.error('uncaughtException', error);
+  });
+  process.on('unhandledRejection', (reason, promise) => {
+    Logger.error('unhandler rejection at:', promise, 'reason:', reason);
+  });
+}
+
+// if (!app.requestSingleInstanceLock()) {
+//   app.quit();
+//   process.exit();
+// } else {
+//   setUserDataDir();
+
+//   app.whenReady().then(async () => {
+//     electronApp.setAppUserModelId(import.meta.env.VITE_MAIN_BUNDLE_ID || 'com.practice.electron');
+
+//     // const isLaunchToTray = ConfigManager.getLaunchToTray();
+//   });
+// }
 
 function createWindow(): void {
   // Create the browser window.
@@ -22,6 +49,8 @@ function createWindow(): void {
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();
+
+    registerIpc(mainWindow, app);
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -50,13 +79,6 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window);
-  });
-
-  // IPC test
-  ipcMain.on('ipcCall', () => console.log('pong'));
-
-  ipcMain.on('callback', () => {
-    console.log('callback');
   });
 
   createWindow();

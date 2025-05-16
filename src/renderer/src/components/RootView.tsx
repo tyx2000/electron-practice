@@ -1,8 +1,9 @@
-import { FC, ReactNode, useEffect } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import { Provider } from 'react-redux';
 import store from '@renderer/store';
 import styled from 'styled-components';
-import { useWebSocketStore } from '@renderer/store/useWebSocketStore';
+
+import { useWebSocket } from '@renderer/hooks/useWebSocket';
 
 interface props {
   children: ReactNode;
@@ -14,29 +15,24 @@ const Wrapper = styled.div`
 `;
 
 const RootView: FC<props> = ({ children }) => {
-  const { updateWs } = useWebSocketStore();
-  useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
+  const [text, setText] = useState('');
+  const { socketId, messages, handleCreateConnection, handleSendMessage } = useWebSocket();
 
-    ws.onopen = () => {
-      updateWs(ws);
-      console.log('websocket connected');
-    };
+  console.log({ socketId });
 
-    ws.onerror = (error) => {
-      console.log('error', error);
-    };
-
-    ws.onclose = () => {
-      console.log('ws closed');
-    };
-
-    ws.onmessage = (data) => {
-      console.log('receive', data);
-    };
-  }, []);
   return (
     <Provider store={store}>
+      <div>{socketId}</div>
+      <input type="text" onChange={(e) => setText(e.target.value)} />
+      <button onClick={handleCreateConnection}>connect</button>
+      <button onClick={() => handleSendMessage(text)}>send</button>
+      {messages && messages.length
+        ? messages.map((msg) => (
+            <div>
+              {msg.type}-{msg.data}
+            </div>
+          ))
+        : null}
       <Wrapper>{children}</Wrapper>
     </Provider>
   );

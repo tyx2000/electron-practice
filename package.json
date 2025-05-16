@@ -24,6 +24,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
     "@reduxjs/toolkit": "^2.8.2",
+    "electron-log": "^5.4.0",
     "electron-updater": "^6.3.9",
     "lucide-react": "^0.510.0",
     "react-redux": "^9.2.0",
@@ -32,6 +33,7 @@
     "redux-persist": "^6.0.0",
     "styled-components": "^6.1.18",
     "uuid": "^11.1.0",
+    "ws": "^8.18.2",
     "zustand": "^4.5.7"
   },
   "devDependencies": {
