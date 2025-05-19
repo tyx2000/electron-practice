@@ -3,20 +3,21 @@ import { useEffect, useRef, useState } from 'react';
 export const useWebSocket = () => {
   const [socketId, setSocketId] = useState(null);
   const [messages, setMessages] = useState([]);
-  const wsRef = useRef(null);
+  const wsRef = useRef<any>(null);
 
   const handleCreateConnection = async () => {
-    const url = 'ws://localhost:8080';
     try {
-      const newSocketId = await window.api.createWebSocketConnection(url);
+      const newSocketId = await window.api.createWebSocketConnection();
       setSocketId(newSocketId);
       console.log(socketId, newSocketId);
 
       wsRef.current = {
         messageUnsub: window.api.onWebSocketMessage(newSocketId, (data) => {
+          console.log('message', { newSocketId, data });
           setMessages((prev) => [...prev, { type: 'recv', data }]);
         }),
         openUnsub: window.api.onWebSocketOpen(newSocketId, () => {
+          console.log('open', { newSocketId });
           setMessages((prev) => [...prev, { type: 'message', data: 'connected' }]);
         }),
       };

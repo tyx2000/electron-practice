@@ -3,16 +3,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 let webSocketInstances = new Map();
 
-export const initWsConnection = async (event, url) => {
-  console.log({ url });
+export const initWsConnection = async (event) => {
   return new Promise((resolve) => {
     const socketId = uuidv4();
-    const socket = new WebSocket(url);
+    const socket = new WebSocket(`ws://localhost:8080?socketId=${socketId}`);
 
     webSocketInstances.set(socketId, socket);
 
     socket.on('open', () => {
-      event.sender.send('ws-connection-open', socketId);
+      event.sender.send(`ws-connection-open-${socketId}`, socketId);
     });
 
     socket.on('close', () => {
@@ -24,7 +23,8 @@ export const initWsConnection = async (event, url) => {
     });
 
     socket.on('message', (data) => {
-      event.sender.send('ws-message', socketId, data.toString());
+      console.log(socketId, data.toString('utf8'));
+      event.sender.send(`ws-message-${socketId}`, data.toString());
     });
 
     resolve(socketId);

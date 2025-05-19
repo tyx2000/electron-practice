@@ -4,16 +4,16 @@ import { electronAPI } from '@electron-toolkit/preload';
 // Custom APIs for renderer
 const api = {
   testIpcInvoke: () => ipcRenderer.invoke('test-ipc-invoke'),
-  createWebSocketConnection: (url) => ipcRenderer.invoke('create-ws-connection', url),
+  createWebSocketConnection: () => ipcRenderer.invoke('create-ws-connection'),
   sendWebSocketMessage: (socketId, message) =>
     ipcRenderer.invoke('send-ws-message', socketId, message),
   closeWebSocketConnection: (socketId) => ipcRenderer.invoke('close-ws-connection', socketId),
   onWebSocketMessage: (socketId, callback) => {
-    ipcRenderer.on(`ws-message-${socketId}`, (event, data) => {
+    ipcRenderer.on(`ws-message-${socketId}`, (_, data) => {
       callback(data);
     });
     return () => {
-      ipcRenderer.off(`ws-message-${socketId}`, (event, data) => {
+      ipcRenderer.off(`ws-message-${socketId}`, (_, data) => {
         callback(data);
       });
     };
