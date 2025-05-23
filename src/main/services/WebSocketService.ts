@@ -24,7 +24,7 @@ export const initWsConnection = async (event) => {
 
     socket.on('message', (data) => {
       console.log(socketId, data.toString('utf8'));
-      event.sender.send(`ws-message-${socketId}`, data.toString());
+      event.sender.send(`ws-message-${socketId}`, data.toString('utf8'));
     });
 
     resolve(socketId);

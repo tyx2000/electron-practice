@@ -1,8 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
+import { data } from 'react-router';
+
+export interface Message {
+  timestamp: number;
+  from: 'system' | string;
+  to: 'all' | string;
+  content: 'enter' | 'leave' | string;
+}
 
 export const useWebSocket = () => {
   const [socketId, setSocketId] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const wsRef = useRef<any>(null);
 
   const handleCreateConnection = async () => {
@@ -12,13 +20,12 @@ export const useWebSocket = () => {
       console.log(socketId, newSocketId);
 
       wsRef.current = {
-        messageUnsub: window.api.onWebSocketMessage(newSocketId, (data) => {
+        onMessage: window.api.onWebSocketMessage(newSocketId, (data) => {
           console.log('message', { newSocketId, data });
-          setMessages((prev) => [...prev, { type: 'recv', data }]);
+          setMessages((prev) => [...prev, JSON.parse(data)]);
         }),
-        openUnsub: window.api.onWebSocketOpen(newSocketId, () => {
+        onOpen: window.api.onWebSocketOpen(newSocketId, () => {
           console.log('open', { newSocketId });
-          setMessages((prev) => [...prev, { type: 'message', data: 'connected' }]);
         }),
       };
     } catch (error) {
@@ -31,7 +38,7 @@ export const useWebSocket = () => {
       const success = await window.api.sendWebSocketMessage(socketId, message);
       setMessages((prev) => [
         ...prev,
-        { type: success ? 'send' : 'system', data: success ? message : 'sned failed' },
+        { timestamp: new Date(), from: socketId, to: 'all', content: message },
       ]);
     }
   };
@@ -50,6 +57,9 @@ export const useWebSocket = () => {
     //   }
     // };
   }, [socketId]);
+  useEffect(() => {
+    handleCreateConnection();
+  }, []);
 
   return { socketId, messages, handleCreateConnection, handleSendMessage };
 };

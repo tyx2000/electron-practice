@@ -19,13 +19,8 @@ const Message = () => {
   return (
     <MessageWrapper>
       <Messages>
-        {[
-          { time: 12, role: 'system', event: 'enter', user: '1' },
-          { time: 13, role: 'user', event: 'message', user: '2' },
-          { time: 14, role: 'system', event: 'exit', user: '3' },
-          { time: 15, role: 'user', event: 'message', user: '4' },
-        ].map((message) => (
-          <MessageItem key={message.time} {...message} />
+        {messages.map((message) => (
+          <MessageItem key={message.timestamp} {...message} socketId={socketId} />
         ))}
       </Messages>
     </MessageWrapper>
