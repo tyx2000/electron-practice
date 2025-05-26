@@ -1,8 +1,11 @@
 import { useWebSocket } from '@renderer/hooks/useWebSocket';
 import styled from 'styled-components';
 import MessageItem from '@renderer/components/MessageItem';
+import Input from '@renderer/components/Input';
 
 const MessageWrapper = styled.div`
+  height: 100vh;
+  overflow: hidden;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -11,6 +14,7 @@ const MessageWrapper = styled.div`
 
 const Messages = styled.div`
   flex: 1;
+  overflow: hidden scroll;
   background-color: lightyellow;
 `;
 
@@ -20,9 +24,10 @@ const Message = () => {
     <MessageWrapper>
       <Messages>
         {messages.map((message) => (
-          <MessageItem key={message.timestamp} {...message} socketId={socketId} />
+          <MessageItem key={message.from + message.timestamp} {...message} socketId={socketId!} />
         ))}
       </Messages>
+      <Input onSend={(val: string) => handleSendMessage(val)} />
     </MessageWrapper>
   );
 };

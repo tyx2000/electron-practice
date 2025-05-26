@@ -4,10 +4,11 @@ import styled from 'styled-components';
 import { Message } from '@renderer/hooks/useWebSocket';
 
 const Wrapper = styled.div<{ $isSystem: boolean; $isMe: boolean }>`
-  height: 50px;
+  height: 40px;
   display: flex;
   align-items: center;
   padding: 0 10px;
+  border-bottom: 1px dashed #ccc;
   justify-content: ${({ $isSystem, $isMe }) =>
     $isSystem ? 'center' : $isMe ? 'flex-end' : 'flex-start'};
   & > div {
@@ -20,13 +21,19 @@ const Wrapper = styled.div<{ $isSystem: boolean; $isMe: boolean }>`
   }
 `;
 
-const MessageItem: FC<Message & { socketId: string }> = ({ from, to, content, socketId }) => {
-  const isSystem = from === 'system';
+const MessageItem: FC<Message & { socketId: string }> = ({
+  action,
+  from,
+  to,
+  content,
+  socketId,
+}) => {
+  const isSystem = action !== 'message';
   const isMe = from === socketId;
 
   return (
     <Wrapper $isSystem={isSystem} $isMe={isMe}>
-      <div>{isSystem ? `用户${from}${content === 'enter' ? '进入' : '离开'}聊天室` : content}</div>
+      <div>{isSystem ? `用户${from}${action === 'enter' ? '进入' : '离开'}聊天室` : content}</div>
     </Wrapper>
   );
 };

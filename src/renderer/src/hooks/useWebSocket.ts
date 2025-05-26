@@ -1,15 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
-import { data } from 'react-router';
 
 export interface Message {
   timestamp: number;
-  from: 'system' | string;
+  from: string;
   to: 'all' | string;
-  content: 'enter' | 'leave' | string;
+  action: 'enter' | 'leave' | 'message';
+  content: string;
 }
 
-export const useWebSocket = () => {
-  const [socketId, setSocketId] = useState(null);
+interface returnProps {
+  socketId: string;
+  messages: Message[];
+  handleSendMessage: (val: string) => void;
+}
+
+export const useWebSocket = (): returnProps => {
+  const [socketId, setSocketId] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const wsRef = useRef<any>(null);
 
@@ -21,7 +27,7 @@ export const useWebSocket = () => {
 
       wsRef.current = {
         onMessage: window.api.onWebSocketMessage(newSocketId, (data) => {
-          console.log('message', { newSocketId, data });
+          console.log('onmessage', { newSocketId, data }, JSON.parse(data));
           setMessages((prev) => [...prev, JSON.parse(data)]);
         }),
         onOpen: window.api.onWebSocketOpen(newSocketId, () => {
@@ -61,5 +67,5 @@ export const useWebSocket = () => {
     handleCreateConnection();
   }, []);
 
-  return { socketId, messages, handleCreateConnection, handleSendMessage };
+  return { socketId, messages, handleSendMessage };
 };
