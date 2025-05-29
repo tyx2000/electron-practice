@@ -49,19 +49,21 @@ const Textarea = styled.textarea`
 `;
 
 const Input: FC<props> = ({ onSend }) => {
-  useEffect(() => {
-    // console.log('effect', val);
+  const [focused, setFocused] = useState(false);
 
+  useEffect(() => {
     const keydownHandler = (e) => {
-      const el = document.getElementById('message-input')!;
-      console.log(el);
+      const el = document.getElementById('message-input')! as HTMLTextAreaElement;
       if (e.key === 'Enter' && el) {
         e.preventDefault();
         if (e.shiftKey) {
-          console.log('换行');
-          // setVal((v) => v + '\n');
+          el.value += '\n';
         } else {
-          console.log('发送');
+          const v = el.value;
+          if (focused && v && v.trim()) {
+            onSend(v.trim());
+            el.value = '';
+          }
         }
       }
     };
@@ -70,7 +72,7 @@ const Input: FC<props> = ({ onSend }) => {
     return () => {
       document.removeEventListener('keydown', keydownHandler);
     };
-  }, []);
+  }, [focused]);
 
   return (
     <Wrapper>
@@ -85,7 +87,12 @@ const Input: FC<props> = ({ onSend }) => {
         <EllipsisVertical color="#3F4349" size={18} />
         <History color="#3F4349" size={18} />
       </Toolbar>
-      <Textarea id="message-input" />
+      <Textarea
+        spellCheck={false}
+        id="message-input"
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+      />
     </Wrapper>
   );
 };

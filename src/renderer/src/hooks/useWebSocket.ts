@@ -1,4 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { appendNewMessage, setSocketId } from '@renderer/store/webSocketSlice';
+import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 export interface Message {
   timestamp: number;
@@ -9,26 +12,32 @@ export interface Message {
 }
 
 interface returnProps {
-  socketId: string;
-  messages: Message[];
+  // socketId: string;
+  // messages: Message[];
   handleSendMessage: (val: string) => void;
 }
 
-export const useWebSocket = (): returnProps => {
-  const [socketId, setSocketId] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+export const useWebSocket = (pathname: string): returnProps => {
+  const dispatch = useDispatch();
+  const socketId = useSelector((state) => state.webSocket.socketId);
+
+  console.log(socketId, pathname);
+
+  // const [messages, setMessages] = useState<Message[]>([]);
   const wsRef = useRef<any>(null);
 
   const handleCreateConnection = async () => {
     try {
       const newSocketId = await window.api.createWebSocketConnection();
-      setSocketId(newSocketId);
-      console.log(socketId, newSocketId);
+      dispatch(setSocketId(newSocketId));
 
       wsRef.current = {
         onMessage: window.api.onWebSocketMessage(newSocketId, (data) => {
-          console.log('onmessage', { newSocketId, data }, JSON.parse(data));
-          setMessages((prev) => [...prev, JSON.parse(data)]);
+          const message = JSON.parse(data);
+          dispatch(appendNewMessage(message));
+          if (pathname !== '/') {
+            toast(message.content);
+          }
         }),
         onOpen: window.api.onWebSocketOpen(newSocketId, () => {
           console.log('open', { newSocketId });
@@ -42,10 +51,15 @@ export const useWebSocket = (): returnProps => {
   const handleSendMessage = async (message) => {
     if (socketId && message) {
       const success = await window.api.sendWebSocketMessage(socketId, message);
-      setMessages((prev) => [
-        ...prev,
-        { timestamp: new Date(), from: socketId, to: 'all', content: message },
-      ]);
+      dispatch(
+        appendNewMessage({
+          timestamp: Date.now(),
+          from: socketId,
+          to: 'all',
+          action: 'message',
+          content: message,
+        }),
+      );
     }
   };
 
@@ -53,12 +67,12 @@ export const useWebSocket = (): returnProps => {
     console.log('useWebSocket', socketId);
     // return () => {
     //   if (wsRef.current) {
-    //     wsRef.current.messageUnsub();
-    //     wsRef.current.openUnsub();
-    //     // window.api.closeWebSocketConnection(socketId);
+    //     // wsRef.current.messageUnsub();
+    //     // wsRef.current.openUnsub();
+    //     window.api.closeWebSocketConnection(socketId);
     //     setSocketId(() => {
     //       console.log('set socketId null');
-    //       return null;
+    //       return '';
     //     });
     //   }
     // };
@@ -67,5 +81,5 @@ export const useWebSocket = (): returnProps => {
     handleCreateConnection();
   }, []);
 
-  return { socketId, messages, handleSendMessage };
+  return { handleSendMessage };
 };

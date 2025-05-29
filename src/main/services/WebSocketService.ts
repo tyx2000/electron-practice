@@ -16,10 +16,12 @@ export const initWsConnection = async (event) => {
 
     socket.on('close', () => {
       console.log(socketId, ' closed');
+      webSocketInstances.delete(socketId);
     });
 
     socket.on('error', (error) => {
       console.log('socket error', error);
+      webSocketInstances.delete(socketId);
     });
 
     socket.on('message', (data) => {
@@ -32,6 +34,7 @@ export const initWsConnection = async (event) => {
 };
 
 export const sendWsMessage = (event, socketId, message) => {
+  console.log('=======', socketId, message);
   const socket = webSocketInstances.get(socketId);
 
   if (socket && socket.readyState === 1) {
