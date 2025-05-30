@@ -15,17 +15,16 @@ export const initWsConnection = async (event) => {
     });
 
     socket.on('close', () => {
-      console.log(socketId, ' closed');
+      event.sender.send(`ws-connection-closed-${socketId}`, socketId);
       webSocketInstances.delete(socketId);
     });
 
-    socket.on('error', (error) => {
-      console.log('socket error', error);
+    socket.on('error', () => {
+      event.sender.send(`ws-connection-closed-${socketId}`, socketId);
       webSocketInstances.delete(socketId);
     });
 
     socket.on('message', (data) => {
-      console.log(socketId, data.toString('utf8'));
       event.sender.send(`ws-message-${socketId}`, data.toString('utf8'));
     });
 

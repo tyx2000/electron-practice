@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import MessageItem from '@renderer/components/MessageItem';
 import Input from '@renderer/components/Input';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { sendWsMessage } from '@renderer/store/webSocketSlice';
 
 const MessageWrapper = styled.div`
   height: 100vh;
@@ -19,9 +20,8 @@ const Messages = styled.div`
 `;
 
 const Message = () => {
-  // const { socketId, messages, handleSendMessage } = useWebSocket();
+  const dispatch = useDispatch();
   const { socketId, messages } = useSelector((state) => state.webSocket);
-  console.log('Message', { socketId, messages });
   return (
     <MessageWrapper>
       <Messages>
@@ -29,7 +29,7 @@ const Message = () => {
           <MessageItem key={message.from + message.timestamp} {...message} socketId={socketId!} />
         ))}
       </Messages>
-      <Input onSend={(val: string) => handleSendMessage(val)} />
+      <Input onSend={(val: string) => dispatch(sendWsMessage({ socketId, content: val }))} />
     </MessageWrapper>
   );
 };

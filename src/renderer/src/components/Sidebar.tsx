@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import Menu from './Menu';
 import UserNav from './UserNav';
-import { useLocation } from 'react-router';
-import { useWebSocket } from '@renderer/hooks/useWebSocket';
 
 const Wrapper = styled.div`
   width: 50px;
@@ -15,11 +13,6 @@ const Wrapper = styled.div`
 `;
 
 const Sidebar = () => {
-  const { pathname } = useLocation();
-
-  console.log({ pathname });
-
-  const {} = useWebSocket(pathname);
   return (
     <Wrapper>
       <Menu />

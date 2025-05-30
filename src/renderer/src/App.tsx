@@ -4,6 +4,8 @@ import ShareFile from './pages/ShareFile';
 import ShareScreen from './pages/ShareScreen';
 import Sidebar from './components/Sidebar';
 import RootView from './components/RootView';
+import { Provider } from 'react-redux';
+import store from '@renderer/store';
 
 function App(): React.JSX.Element {
   // const ipcHandle = (): void => {
@@ -12,16 +14,18 @@ function App(): React.JSX.Element {
   // }
 
   return (
-    <RootView>
+    <Provider store={store}>
       <HashRouter>
-        <Sidebar />
-        <Routes>
-          <Route path="/" element={<Messages />} />
-          <Route path="/shareFile" element={<ShareFile />} />
-          <Route path="/shareScreen" element={<ShareScreen />} />
-        </Routes>
+        <RootView>
+          <Sidebar />
+          <Routes>
+            <Route path="/" element={<Messages />} />
+            <Route path="/shareFile" element={<ShareFile />} />
+            <Route path="/shareScreen" element={<ShareScreen />} />
+          </Routes>
+        </RootView>
       </HashRouter>
-    </RootView>
+    </Provider>
   );
 }
 

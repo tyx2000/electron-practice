@@ -10,7 +10,6 @@ const api = {
   closeWebSocketConnection: (socketId) => ipcRenderer.invoke('close-ws-connection', socketId),
   onWebSocketMessage: (socketId, callback) => {
     ipcRenderer.on(`ws-message-${socketId}`, (_, data) => {
-      console.log(`ws-message-${socketId}`, data);
       callback(data);
     });
     return () => {
@@ -24,6 +23,9 @@ const api = {
     return () => {
       ipcRenderer.off(`ws-connection-open-${socketId}`, callback);
     };
+  },
+  onWebSocketClosed: (socketId, callback) => {
+    ipcRenderer.on(`ws-connection-closed-${socketId}`, callback);
   },
 };
 

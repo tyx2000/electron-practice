@@ -17,69 +17,38 @@ interface returnProps {
   handleSendMessage: (val: string) => void;
 }
 
-export const useWebSocket = (pathname: string): returnProps => {
+export const useWebSocket = (): returnProps => {
   const dispatch = useDispatch();
-  const socketId = useSelector((state) => state.webSocket.socketId);
+  const { socketId } = useSelector((state) => state.webSocket);
 
-  console.log(socketId, pathname);
-
-  // const [messages, setMessages] = useState<Message[]>([]);
   const wsRef = useRef<any>(null);
 
   const handleCreateConnection = async () => {
     try {
-      const newSocketId = await window.api.createWebSocketConnection();
-      dispatch(setSocketId(newSocketId));
-
+      let newSocketId = '';
+      if (socketId) {
+        newSocketId = socketId;
+      } else {
+        newSocketId = await window.api.createWebSocketConnection();
+      }
       wsRef.current = {
         onMessage: window.api.onWebSocketMessage(newSocketId, (data) => {
           const message = JSON.parse(data);
           dispatch(appendNewMessage(message));
-          if (pathname !== '/') {
-            toast(message.content);
-          }
         }),
         onOpen: window.api.onWebSocketOpen(newSocketId, () => {
-          console.log('open', { newSocketId });
+          dispatch(setSocketId(newSocketId));
+        }),
+        onClose: window.api.onWebSocketClosed(newSocketId, () => {
+          dispatch(setSocketId(''));
         }),
       };
     } catch (error) {
-      console.error('connect failed', error);
+      toast('链接失败');
     }
   };
 
-  const handleSendMessage = async (message) => {
-    if (socketId && message) {
-      const success = await window.api.sendWebSocketMessage(socketId, message);
-      dispatch(
-        appendNewMessage({
-          timestamp: Date.now(),
-          from: socketId,
-          to: 'all',
-          action: 'message',
-          content: message,
-        }),
-      );
-    }
-  };
-
-  useEffect(() => {
-    console.log('useWebSocket', socketId);
-    // return () => {
-    //   if (wsRef.current) {
-    //     // wsRef.current.messageUnsub();
-    //     // wsRef.current.openUnsub();
-    //     window.api.closeWebSocketConnection(socketId);
-    //     setSocketId(() => {
-    //       console.log('set socketId null');
-    //       return '';
-    //     });
-    //   }
-    // };
-  }, [socketId]);
   useEffect(() => {
     handleCreateConnection();
   }, []);
-
-  return { handleSendMessage };
 };
