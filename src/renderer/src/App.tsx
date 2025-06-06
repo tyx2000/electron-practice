@@ -20,6 +20,7 @@ function App(): React.JSX.Element {
           <Sidebar />
           <Routes>
             <Route path="/" element={<Messages />} />
+            <Route path="/:socketId" element={<Messages />} />
             <Route path="/shareFile" element={<ShareFile />} />
             <Route path="/shareScreen" element={<ShareScreen />} />
           </Routes>

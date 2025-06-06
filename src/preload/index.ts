@@ -2,6 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from '@electron-toolkit/preload';
 
 // Custom APIs for renderer
+// 提供给HTML中以window.api.[function name]的方式调用
 const api = {
   testIpcInvoke: () => ipcRenderer.invoke('test-ipc-invoke'),
   createWebSocketConnection: () => ipcRenderer.invoke('create-ws-connection'),
@@ -9,6 +10,7 @@ const api = {
     ipcRenderer.invoke('send-ws-message', socketId, message),
   closeWebSocketConnection: (socketId) => ipcRenderer.invoke('close-ws-connection', socketId),
   onWebSocketMessage: (socketId, callback) => {
+    // 监听 event.sender.send([name], arg)
     ipcRenderer.on(`ws-message-${socketId}`, (_, data) => {
       callback(data);
     });
@@ -26,6 +28,15 @@ const api = {
   },
   onWebSocketClosed: (socketId, callback) => {
     ipcRenderer.on(`ws-connection-closed-${socketId}`, callback);
+  },
+  uploadFileHandler: (callback) => {
+    // ipcRender.invoke([name], arg) arg cannot be func !?
+    ipcRenderer.invoke('upload-file');
+    ipcRenderer.once('upload-success', callback);
+    ipcRenderer.once('upload-error', callback);
+  },
+  openPreviewWindowHandler: (url) => {
+    ipcRenderer.invoke('open-preview-window', url);
   },
 };
 

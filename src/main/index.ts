@@ -4,7 +4,6 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
 import { isDev } from './constant';
 import Logger from 'electron-log';
-import { setUserDataDir } from './utils/file';
 import { registerIpc } from './ipc';
 // import { ConfigManager } from './services/ConfigManager';
 
@@ -46,6 +45,7 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
+      webviewTag: true,
     },
   });
 

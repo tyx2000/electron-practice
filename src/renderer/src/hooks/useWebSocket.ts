@@ -48,7 +48,7 @@ export const useWebSocket = (): returnProps => {
     }
   };
 
-  useEffect(() => {
-    handleCreateConnection();
-  }, []);
+  // useEffect(() => {
+  //   handleCreateConnection();
+  // }, []);
 };

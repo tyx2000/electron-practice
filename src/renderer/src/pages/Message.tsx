@@ -3,6 +3,7 @@ import MessageItem from '@renderer/components/MessageItem';
 import Input from '@renderer/components/Input';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendWsMessage } from '@renderer/store/webSocketSlice';
+import { useLocation, useParams } from 'react-router';
 
 const MessageWrapper = styled.div`
   height: 100vh;
@@ -22,6 +23,10 @@ const Messages = styled.div`
 const Message = () => {
   const dispatch = useDispatch();
   const { socketId, messages } = useSelector((state) => state.webSocket);
+
+  const { socketId: palSocketId } = useParams();
+  console.log({ palSocketId });
+
   return (
     <MessageWrapper>
       <Messages>
