@@ -8,11 +8,6 @@ import { Provider } from 'react-redux';
 import store from '@renderer/store';
 
 function App(): React.JSX.Element {
-  // const ipcHandle = (): void => {
-  //   console.log('aaaaaaaa')
-  //   window.electron.ipcRenderer.send('callback')
-  // }
-
   return (
     <Provider store={store}>
       <HashRouter>

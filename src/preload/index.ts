@@ -35,9 +35,11 @@ const api = {
     ipcRenderer.once('upload-success', callback);
     ipcRenderer.once('upload-error', callback);
   },
-  openPreviewWindowHandler: (url) => {
-    ipcRenderer.invoke('open-preview-window', url);
+  createConferenceWindow: (socketId) => {
+    ipcRenderer.invoke('create-conference-window', socketId);
   },
+  onSignalingSocketId: (callback) =>
+    ipcRenderer.on('signaling-socket-id', (_, socketId) => callback(socketId)),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

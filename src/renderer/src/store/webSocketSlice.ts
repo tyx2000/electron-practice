@@ -1,23 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { Message } from '@renderer/hooks/useWebSocket';
 
-export const sendWsMessage = createAsyncThunk('', async ({ socketId, content }) => {
-  const success = await window.api.sendWebSocketMessage(socketId, content);
-  if (success) {
-    return {
-      timestamp: Date.now(),
-      from: socketId,
-      to: 'all',
-      action: 'message',
-      content,
-    };
-  } else {
-    return null;
-  }
-});
+export const sendWsMessage = createAsyncThunk(
+  '',
+  async ({ socketId, data }: { socketId: string; data: Message }) => {
+    const success = await window.api.sendWebSocketMessage(socketId, data);
+    return success ? data : null;
+  },
+);
 
 export const webSocketSlice = createSlice({
   name: 'webSocket',
   initialState: {
+    clientsAmount: 0,
     socketId: '',
     newMessage: {},
     messages: [],
@@ -29,7 +24,9 @@ export const webSocketSlice = createSlice({
       })
       .addCase(sendWsMessage.fulfilled, (state, action) => {
         console.log('fulfilled', state, action.payload);
+        // @ts-ignore
         state.newMessage = action.payload;
+        // @ts-ignore
         state.messages.push(action.payload);
       })
       .addCase(sendWsMessage.rejected, (state, action) => {
@@ -40,6 +37,9 @@ export const webSocketSlice = createSlice({
     setSocketId: (state, action) => {
       state.socketId = action.payload;
     },
+    setClientsAmount: (state, action) => {
+      state.clientsAmount = action.payload;
+    },
     appendNewMessage: (state, action) => {
       // @ts-ignore
       state.messages.push(action.payload);
@@ -47,6 +47,6 @@ export const webSocketSlice = createSlice({
   },
 });
 
-export const { setSocketId, appendNewMessage } = webSocketSlice.actions;
+export const { setSocketId, setClientsAmount, appendNewMessage } = webSocketSlice.actions;
 
 export default webSocketSlice.reducer;

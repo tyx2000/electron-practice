@@ -1,11 +1,10 @@
 import WebSocket from 'ws';
-import { v4 as uuidv4 } from 'uuid';
 
 let webSocketInstances = new Map();
 
 export const initWsConnection = async (event) => {
   return new Promise((resolve) => {
-    const socketId = uuidv4();
+    const socketId = Math.random().toString(36).slice(2);
     const socket = new WebSocket(`ws://localhost:8080?socketId=${socketId}`);
 
     webSocketInstances.set(socketId, socket);
@@ -20,24 +19,23 @@ export const initWsConnection = async (event) => {
     });
 
     socket.on('error', () => {
-      event.sender.send(`ws-connection-closed-${socketId}`, socketId);
-      webSocketInstances.delete(socketId);
+      event.sender.send(`ws-connection-error-${socketId}`, socketId);
     });
 
-    socket.on('message', (data) => {
-      event.sender.send(`ws-message-${socketId}`, data.toString('utf8'));
+    socket.on('message', (message) => {
+      const data = JSON.parse(message);
+      event.sender.send(`ws-message-${socketId}`, data);
     });
 
     resolve(socketId);
   });
 };
 
-export const sendWsMessage = (event, socketId, message) => {
-  console.log('=======', socketId, message);
+export const sendWsMessage = (_, socketId, message) => {
   const socket = webSocketInstances.get(socketId);
 
   if (socket && socket.readyState === 1) {
-    socket.send(message);
+    socket.send(JSON.stringify(message));
     return true;
   }
 

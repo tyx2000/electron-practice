@@ -5,7 +5,6 @@ import icon from '../../resources/icon.png?asset';
 import { isDev } from './constant';
 import Logger from 'electron-log';
 import { registerIpc } from './ipc';
-// import { ConfigManager } from './services/ConfigManager';
 
 if (!isDev) {
   process.on('uncaughtException', (error) => {
@@ -16,26 +15,13 @@ if (!isDev) {
   });
 }
 
-// if (!app.requestSingleInstanceLock()) {
-//   app.quit();
-//   process.exit();
-// } else {
-//   setUserDataDir();
-
-//   app.whenReady().then(async () => {
-//     electronApp.setAppUserModelId(import.meta.env.VITE_MAIN_BUNDLE_ID || 'com.practice.electron');
-
-//     // const isLaunchToTray = ConfigManager.getLaunchToTray();
-//   });
-// }
-
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
-    minWidth: 900,
-    minHeight: 670,
+    width: 1000,
+    height: 800,
+    minWidth: 1000,
+    minHeight: 800,
     show: false,
     // frame: false,
     autoHideMenuBar: true,
@@ -48,6 +34,8 @@ function createWindow(): void {
       webviewTag: true,
     },
   });
+
+  mainWindow.label = 'main';
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();
@@ -84,6 +72,14 @@ app.whenReady().then(() => {
   });
 
   createWindow();
+
+  ipcMain.on('inter-windows-invoke', (event, args) => {
+    console.log('inter-windows-invoke', args);
+    event.sender.send('inter-windows-invoke-reply', { name: 'abc' });
+
+    const allWindows = BrowserWindow.getAllWindows();
+    console.log(allWindows);
+  });
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

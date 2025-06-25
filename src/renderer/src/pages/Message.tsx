@@ -3,7 +3,7 @@ import MessageItem from '@renderer/components/MessageItem';
 import Input from '@renderer/components/Input';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendWsMessage } from '@renderer/store/webSocketSlice';
-import { useLocation, useParams } from 'react-router';
+import { useEffect } from 'react';
 
 const MessageWrapper = styled.div`
   height: 100vh;
@@ -22,10 +22,15 @@ const Messages = styled.div`
 
 const Message = () => {
   const dispatch = useDispatch();
-  const { socketId, messages } = useSelector((state) => state.webSocket);
+  // @ts-ignore
+  const { socketId, clientsAmount, messages } = useSelector((state) => state.webSocket);
 
-  const { socketId: palSocketId } = useParams();
-  console.log({ palSocketId });
+  console.log('message', { socketId, messages, clientsAmount });
+
+  useEffect(() => {
+    const bottomIndicator = document.getElementById('bottomIndicator');
+    bottomIndicator?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages.length]);
 
   return (
     <MessageWrapper>
@@ -33,8 +38,25 @@ const Message = () => {
         {messages.map((message) => (
           <MessageItem key={message.from + message.timestamp} {...message} socketId={socketId!} />
         ))}
+        <div id="bottomIndicator"></div>
       </Messages>
-      <Input onSend={(val: string) => dispatch(sendWsMessage({ socketId, content: val }))} />
+      <Input
+        onSend={(val: string) =>
+          dispatch(
+            // @ts-ignore
+            sendWsMessage({
+              socketId,
+              data: {
+                timestamp: Date.now(),
+                from: socketId,
+                to: 'all',
+                type: 'chat-message',
+                data: val,
+              },
+            }),
+          )
+        }
+      />
     </MessageWrapper>
   );
 };

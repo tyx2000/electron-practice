@@ -51,7 +51,7 @@ const Menu = () => {
   return (
     <Menus>
       {menus.map((menu) => (
-        <Link to={menu.path} id={menu.id}>
+        <Link to={menu.path} key={menu.id}>
           <MenuItem $active={pathname === menu.path}>{menu.icon}</MenuItem>
         </Link>
       ))}
