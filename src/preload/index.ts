@@ -35,16 +35,12 @@ const api = {
     ipcRenderer.once('upload-success', callback);
     ipcRenderer.once('upload-error', callback);
   },
-  createConferenceWindow: (socketId) => {
-    ipcRenderer.invoke('create-conference-window', socketId);
-  },
-  onSignalingSocketId: (callback) =>
-    ipcRenderer.on('signaling-socket-id', (_, socketId) => callback(socketId)),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise
 // just add to the DOM global.
+console.log('process.contextIsolated', process.contextIsolated);
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI);

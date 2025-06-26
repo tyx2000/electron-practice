@@ -5,7 +5,7 @@ export const sendWsMessage = createAsyncThunk(
   '',
   async ({ socketId, data }: { socketId: string; data: Message }) => {
     const success = await window.api.sendWebSocketMessage(socketId, data);
-    return success ? data : null;
+    return success ? data : {};
   },
 );
 
@@ -24,10 +24,12 @@ export const webSocketSlice = createSlice({
       })
       .addCase(sendWsMessage.fulfilled, (state, action) => {
         console.log('fulfilled', state, action.payload);
-        // @ts-ignore
-        state.newMessage = action.payload;
-        // @ts-ignore
-        state.messages.push(action.payload);
+        if (type === 'chat-message') {
+          // @ts-ignore
+          state.newMessage = action.payload;
+          // @ts-ignore
+          state.messages.push(action.payload);
+        }
       })
       .addCase(sendWsMessage.rejected, (state, action) => {
         console.log('rejected');

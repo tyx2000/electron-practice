@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron';
+import { app, shell, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
@@ -35,8 +35,6 @@ function createWindow(): void {
     },
   });
 
-  mainWindow.label = 'main';
-
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();
 
@@ -72,14 +70,6 @@ app.whenReady().then(() => {
   });
 
   createWindow();
-
-  ipcMain.on('inter-windows-invoke', (event, args) => {
-    console.log('inter-windows-invoke', args);
-    event.sender.send('inter-windows-invoke-reply', { name: 'abc' });
-
-    const allWindows = BrowserWindow.getAllWindows();
-    console.log(allWindows);
-  });
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

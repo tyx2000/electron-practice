@@ -18,6 +18,11 @@ export const useWebSocket = () => {
 
   const wsRef = useRef<any>(null);
 
+  const handleCreatedRoom = async (data) => {
+    console.log('created room', data);
+
+    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+  };
   const handleJoinedRoom = (data) => {};
   const handleOffer = (data) => {};
   const handleAnswer = (data) => {};
@@ -31,6 +36,9 @@ export const useWebSocket = () => {
         break;
       case 'chat-message':
         dispatch(appendNewMessage(data));
+        break;
+      case 'created-room':
+        handleCreatedRoom(data);
         break;
       case 'joined-room':
         handleJoinedRoom(data);

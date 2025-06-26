@@ -1,4 +1,5 @@
-import { useSelector } from 'react-redux';
+import { sendWsMessage } from '@renderer/store/webSocketSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 const ShareScreenWrapper = styled.div`
@@ -19,12 +20,24 @@ const ShareScreenWrapper = styled.div`
 `;
 
 const ShareScreen = () => {
+  const dispatch = useDispatch();
   // @ts-ignore
   const { socketId } = useSelector((state) => state.webSocket);
 
   const launchConference = async () => {
     console.log(socketId);
-    await window.api.createConferenceWindow(socketId);
+    dispatch(
+      // @ts-ignore
+      sendWsMessage({
+        socketId,
+        data: {
+          timestamp: Date.now(),
+          from: socketId,
+          to: 'all',
+          type: 'create-room',
+        },
+      }),
+    );
   };
 
   const attendConference = () => {
