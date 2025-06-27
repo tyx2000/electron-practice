@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow } from 'electron';
+import { app, shell, BrowserWindow, session, desktopCapturer } from 'electron';
 import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import icon from '../../resources/icon.png?asset';
@@ -34,6 +34,15 @@ function createWindow(): void {
       webviewTag: true,
     },
   });
+
+  session.defaultSession.setDisplayMediaRequestHandler(
+    (request, callback) => {
+      desktopCapturer.getSources({ types: ['screen', 'window'] }).then((sources) => {
+        callback({ video: sources[0], audio: 'loopback' });
+      });
+    },
+    { useSystemPicker: true },
+  );
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show();

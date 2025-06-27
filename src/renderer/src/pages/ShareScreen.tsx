@@ -26,6 +26,11 @@ const ShareScreen = () => {
 
   const launchConference = async () => {
     console.log(socketId);
+    // try {
+    //   const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+    // } catch (error) {
+    //   console.log('error', error);
+    // }
     dispatch(
       // @ts-ignore
       sendWsMessage({
@@ -35,6 +40,7 @@ const ShareScreen = () => {
           from: socketId,
           to: 'all',
           type: 'create-room',
+          data: '',
         },
       }),
     );

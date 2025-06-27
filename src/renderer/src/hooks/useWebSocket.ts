@@ -18,10 +18,15 @@ export const useWebSocket = () => {
 
   const wsRef = useRef<any>(null);
 
+  // 成功创建会议房间
   const handleCreatedRoom = async (data) => {
     console.log('created room', data);
 
-    const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleJoinedRoom = (data) => {};
   const handleOffer = (data) => {};
@@ -32,9 +37,11 @@ export const useWebSocket = () => {
     console.log('usewebsocket message', data);
     switch (data.type) {
       case 'notification':
+        // 同步当前在线人数
         dispatch(setClientsAmount(data.data));
         break;
       case 'chat-message':
+        // 将收到的消息添加到消息数组
         dispatch(appendNewMessage(data));
         break;
       case 'created-room':
@@ -86,4 +93,6 @@ export const useWebSocket = () => {
   useEffect(() => {
     handleCreateConnection();
   }, []);
+
+  return handleMessage;
 };

@@ -20,10 +20,12 @@ export const webSocketSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(sendWsMessage.pending, (state, action) => {
-        console.log('pending');
+        console.log('pending', state, action);
       })
       .addCase(sendWsMessage.fulfilled, (state, action) => {
         console.log('fulfilled', state, action.payload);
+        // @ts-ignore
+        const { type } = action.payload;
         if (type === 'chat-message') {
           // @ts-ignore
           state.newMessage = action.payload;
@@ -32,7 +34,7 @@ export const webSocketSlice = createSlice({
         }
       })
       .addCase(sendWsMessage.rejected, (state, action) => {
-        console.log('rejected');
+        console.log('rejected', state, action);
       });
   },
   reducers: {

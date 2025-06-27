@@ -2,7 +2,6 @@ import { BrowserWindow, ipcMain } from 'electron';
 import { closeWsConnection, initWsConnection, sendWsMessage } from './services/WebSocketService';
 // import { AppUpdater } from 'electron-updater';
 import { openPreviewWindow, uploadFile } from './services/UploadFileService';
-import { createConferenceRoom } from './services/ConferenceService';
 
 // 在 window-ready-to-show 回调中注册，在 preload 中可以 ipcRenderer.invoke(name, arg) 方式触发
 export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
@@ -24,6 +23,4 @@ export function registerIpc(mainWindow: BrowserWindow, app: Electron.App) {
   ipcMain.handle('upload-file', uploadFile);
 
   ipcMain.handle('open-preview-window', openPreviewWindow);
-
-  ipcMain.handle('create-conference-room', createConferenceRoom);
 }
