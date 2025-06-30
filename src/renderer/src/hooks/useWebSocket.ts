@@ -2,6 +2,7 @@ import { appendNewMessage, setClientsAmount, setSocketId } from '@renderer/store
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
+import { useWebRTC } from './useWebRTC';
 
 export interface Message {
   timestamp: number;
@@ -13,25 +14,17 @@ export interface Message {
 
 export const useWebSocket = () => {
   const dispatch = useDispatch();
+  const {
+    startShareScreen,
+    handleJoinedRoom,
+    handleReceiveOffer,
+    handleReceiveAnswer,
+    handleCandidate,
+  } = useWebRTC();
   // @ts-ignore
   const { socketId } = useSelector((state) => state.webSocket);
 
   const wsRef = useRef<any>(null);
-
-  // 成功创建会议房间
-  const handleCreatedRoom = async (data) => {
-    console.log('created room', data);
-
-    try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const handleJoinedRoom = (data) => {};
-  const handleOffer = (data) => {};
-  const handleAnswer = (data) => {};
-  const handleCandidate = (data) => {};
 
   const handleMessage = (data) => {
     console.log('usewebsocket message', data);
@@ -45,16 +38,17 @@ export const useWebSocket = () => {
         dispatch(appendNewMessage(data));
         break;
       case 'created-room':
-        handleCreatedRoom(data);
+        // handleCreatedRoom(data);
+        startShareScreen(true);
         break;
       case 'joined-room':
-        handleJoinedRoom(data);
+        handleJoinedRoom();
         break;
       case 'offer':
-        handleOffer(data);
+        handleReceiveOffer(data);
         break;
       case 'answer':
-        handleAnswer(data);
+        handleReceiveAnswer(data);
         break;
       case 'candidate':
         handleCandidate(data);

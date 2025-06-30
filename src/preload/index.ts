@@ -35,6 +35,8 @@ const api = {
     ipcRenderer.once('upload-success', callback);
     ipcRenderer.once('upload-error', callback);
   },
+
+  createPeerConnection: () => ipcRenderer.invoke('create-peer-connection'),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to

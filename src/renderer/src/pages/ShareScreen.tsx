@@ -1,4 +1,6 @@
+import { useWebRTC } from '@renderer/hooks/useWebRTC';
 import { sendWsMessage } from '@renderer/store/webSocketSlice';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
@@ -24,13 +26,13 @@ const ShareScreen = () => {
   // @ts-ignore
   const { socketId } = useSelector((state) => state.webSocket);
 
+  useEffect(() => {
+    console.log('share screen mounted');
+  }, []);
+
   const launchConference = async () => {
     console.log(socketId);
-    // try {
-    //   const stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-    // } catch (error) {
-    //   console.log('error', error);
-    // }
+
     dispatch(
       // @ts-ignore
       sendWsMessage({
@@ -54,6 +56,7 @@ const ShareScreen = () => {
     <ShareScreenWrapper>
       <div onClick={launchConference}>发起会议</div>
       <div onClick={attendConference}>加入会议</div>
+      <video id="video-stream" autoPlay></video>
     </ShareScreenWrapper>
   );
 };

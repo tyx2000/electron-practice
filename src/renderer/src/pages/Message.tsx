@@ -32,6 +32,10 @@ const Message = () => {
     bottomIndicator?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
 
+  useEffect(() => {
+    console.log('message mounted');
+  }, []);
+
   return (
     <MessageWrapper>
       <Messages>

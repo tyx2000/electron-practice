@@ -22,14 +22,10 @@ const RootView: FC<props> = ({ children }) => {
 
   useEffect(() => {
     if (pathname !== '/') {
-      let toastText = '';
-      const { action, from, content } = newMessage;
-      if (action !== 'message') {
-        toastText = `用户 ${from} ${action === 'enter' ? '进入' : '离开'}聊天室`;
-      } else {
-        toastText = content;
+      const { type, from, data } = newMessage;
+      if (type === 'chat-message') {
+        toast(`${from}：${data}`);
       }
-      toast(toastText);
     }
   }, [JSON.stringify(newMessage)]);
 
