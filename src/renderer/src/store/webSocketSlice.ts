@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Message } from '@renderer/hooks/useWebSocket';
 
 export const sendWsMessage = createAsyncThunk(
   '',
-  async ({ socketId, data }: { socketId: string; data: Message }) => {
+  async ({ socketId, data }: { socketId: string; data: Record<string, any> }) => {
+    console.log('send args', { socketId, data });
     const success = await window.api.sendWebSocketMessage(socketId, data);
     return success ? data : {};
   },
@@ -19,11 +19,10 @@ export const webSocketSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(sendWsMessage.pending, (state, action) => {
-        console.log('pending', state, action);
+      .addCase(sendWsMessage.pending, () => {
+        // console.log('send pending');
       })
       .addCase(sendWsMessage.fulfilled, (state, action) => {
-        console.log('fulfilled', state, action.payload);
         // @ts-ignore
         const { type } = action.payload;
         if (type === 'chat-message') {

@@ -5,6 +5,9 @@ let webSocketInstances = new Map();
 export const initWsConnection = async (event) => {
   return new Promise((resolve) => {
     const socketId = Math.random().toString(36).slice(2);
+
+    console.log('init socketId', socketId);
+
     const socket = new WebSocket(`ws://localhost:8080?socketId=${socketId}`);
 
     webSocketInstances.set(socketId, socket);
@@ -33,6 +36,8 @@ export const initWsConnection = async (event) => {
 
 export const sendWsMessage = (_, socketId, message) => {
   const socket = webSocketInstances.get(socketId);
+
+  console.log('===>>>>>>>>', socketId, '///', webSocketInstances.has(socketId), '///', message);
 
   if (socket && socket.readyState === 1) {
     socket.send(JSON.stringify(message));

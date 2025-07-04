@@ -1,5 +1,6 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { sendWsMessage } from '@renderer/store/webSocketSlice';
 
 const config = {
   iceServers: [
@@ -12,9 +13,14 @@ const config = {
 export const useWebRTC = () => {
   const dispatch = useDispatch();
   // @ts-ignore
-  const { socketId, sendWsMessage } = useSelector((state) => state.webSocket);
+  const { socketId } = useSelector((state) => state.webSocket);
+
+  useEffect(() => {
+    console.log('socketid onchange', socketId);
+  }, [socketId]);
   // @ts-ignore
-  const peerConnection = useRef<RTCPeerConnection>(null);
+  const peerConnection = useRef<RTCPeerConnection>();
+
   const createPeerConnection = (isInitiator): Promise<RTCPeerConnection> => {
     return new Promise((resolve, reject) => {
       if (peerConnection.current) {
@@ -24,8 +30,22 @@ export const useWebRTC = () => {
           const pc = new RTCPeerConnection(config);
 
           pc.onicecandidate = (event) => {
-            handleIceCandidate(event, isInitiator);
-            console.log('onicecandidate', isInitiator, event);
+            if (event.candidate) {
+              dispatch(
+                // @ts-ignore
+                sendWsMessage({
+                  socketId,
+                  data: {
+                    timestamp: Date.now(),
+                    from: socketId,
+                    to: 'all',
+                    type: 'candidate',
+                    isInitiator,
+                    candidate: event.candidate,
+                  },
+                }),
+              );
+            }
           };
           pc.ontrack = (event) => {
             console.log('peerconnection ontrack');
@@ -108,7 +128,10 @@ export const useWebRTC = () => {
       const offer = await peerConnection.current.createOffer();
       await peerConnection.current.setLocalDescription(offer);
 
+      console.log({ socketId });
+
       dispatch(
+        // @ts-ignore
         sendWsMessage({
           socketId,
           data: {
@@ -121,7 +144,7 @@ export const useWebRTC = () => {
         }),
       );
     } catch (error) {
-      console.log('failed to create offer');
+      console.log('failed to create offer', error);
     }
   };
 
@@ -161,24 +184,6 @@ export const useWebRTC = () => {
     }
   };
 
-  const handleIceCandidate = (event, isInitiator) => {
-    if (event.candidate) {
-      dispatch(
-        sendWsMessage({
-          socketId,
-          data: {
-            timestamp: Date.now(),
-            from: socketId,
-            to: 'all',
-            type: 'candidate',
-            isInitiator,
-            candidate: event.candidate,
-          },
-        }),
-      );
-    }
-  };
-
   const handleStream = (stream) => {
     const videoEl = document.getElementById('video-stream') as HTMLVideoElement;
     videoEl.style.width = '600px';
@@ -188,8 +193,6 @@ export const useWebRTC = () => {
     videoEl.style.objectPosition = 'center';
 
     videoEl.srcObject = stream;
-
-    console.log(stream, videoEl);
   };
 
   const startShareScreen = async (isInitiator) => {

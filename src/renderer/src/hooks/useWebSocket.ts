@@ -38,7 +38,6 @@ export const useWebSocket = () => {
         dispatch(appendNewMessage(data));
         break;
       case 'created-room':
-        // handleCreatedRoom(data);
         startShareScreen(true);
         break;
       case 'joined-room':

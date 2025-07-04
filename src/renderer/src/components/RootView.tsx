@@ -18,6 +18,7 @@ const RootView: FC<props> = ({ children }) => {
   const { pathname } = useLocation();
   useWebSocket();
 
+  // @ts-ignore
   const { newMessage } = useSelector((state) => state.webSocket);
 
   useEffect(() => {
